@@ -95,7 +95,7 @@ class StripeCheckoutSessionCreateAPIView(APIView):
             order_items.append(data)
 
         checkout_session = stripe.checkout.Session.create(
-            payment_method_types=["card"],
+            allowed_payment_method_types=["card"],
             line_items=order_items,
             metadata={"order_id": order.id},
             mode="payment",
@@ -123,7 +123,7 @@ class StripeWebhookAPIView(APIView):
             event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
         except ValueError:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        except stripe.error.SignatureVerificationError:
+        except stripe.SignatureVerificationError:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         if event["type"] == "checkout.session.completed":
